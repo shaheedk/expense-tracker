@@ -1,6 +1,5 @@
-import { currentUser } from '@clerk/nextjs/server';
-
-import { db } from './db';
+import { currentUser } from "@clerk/nextjs/server";
+import { db } from "./db";
 
 export const checkUser = async () => {
   const user = await currentUser();
@@ -9,24 +8,22 @@ export const checkUser = async () => {
     return null;
   }
 
-  const loggedInUser = await db.user.findUnique({
-    where: {
-      clerkUserId: user.id,
-    },
+  // Try to find user by Clerk ID
+  let loggedInUser = await db.user.findUnique({
+    where: { clerkUserId: user.id },
   });
 
-  if (loggedInUser) {
-    return loggedInUser;
+  // If user not found, create a new one
+  if (!loggedInUser) {
+    loggedInUser = await db.user.create({
+      data: {
+        clerkUserId: user.id,
+        name: `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim(),
+        imageUrl: user.imageUrl ?? "",
+        email: user.emailAddresses[0]?.emailAddress ?? "",
+      },
+    });
   }
 
-  const newUser = await db.user.create({
-    data: {
-      clerkUserId: user.id,
-      name: `${user.firstName} ${user.lastName}`,
-      imageUrl: user.imageUrl,
-      email: user.emailAddresses[0]?.emailAddress,
-    },
-  });
-
-  return newUser;
+  return loggedInUser;
 };
