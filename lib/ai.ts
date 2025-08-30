@@ -202,7 +202,7 @@ export async function generateAIAnswer(
     Return only the answer text, no additional formatting.`;
 
     const completion = await openai.chat.completions.create({
-      model: 'deepseek/deepseek-chat-v3-0324:free',
+     model: "openai/gpt-4o-mini",
       messages: [
         {
           role: 'system',

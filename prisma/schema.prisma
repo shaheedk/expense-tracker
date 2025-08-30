@@ -1,16 +1,7 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
 model User {
   id          String   @id @default(uuid())
   clerkUserId String   @unique   // 👈 Clerk is the true unique identifier
-  email       String            // 👈 removed @unique to avoid duplicate constraint issues
+  email       String
   name        String?
   imageUrl    String
   createdAt   DateTime @default(now())
@@ -28,7 +19,7 @@ model Record {
   date      DateTime @default(now())
   userId    String
 
-  // Relation -> reference User.id (best practice)
+  // Relation -> reference User.id
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
